@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meme Page</title>
+  <style>
+    body {
+      background-color: #e6d8e7;
+      background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239800a1' fill-opacity='0.22'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+    }
+    header {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      z-index: 10;
+    }
+    h1 {
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #9b4dca;
+      border-radius: 10px;
+      color: white;
+    }
+    img {
+      margin-top: 250px; /* Adjusted to not overlap the fixed header */
+      max-height: 60vh; /* Adjust as needed */
+      max-width: 90vw; /* Adjust as needed */
+    }
+    button {
+      font-size: 2em;
+      padding: 10px 20px;
+      margin-top: 20px; /* Space between the image and button */
+      border: none;
+      border-radius: 5px;
+      background-color: #9b4dca;
+      color: white;
+      cursor: pointer;
+      position: fixed;
+      bottom: 100px; /* Positioned at the bottom */
+      z-index: 10;
+    }
+    button:hover {
+      background-color:  #800080;
+    }
+
+    #breakMessage {
+      display: none; /* Hidden by default */
+      color: white; /* Matching the color scheme */
+      font-size: 1.5em; /* Larger text size */
+      margin: 20px 0; /* Space above and below the message */
+      text-align: center;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: #9b4dca;
+      font: bolder;
+      font-family: sans-serif; 
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Amarti's Study Break Meme Page 😂😂</h1>
+    <div id="breakMessage">Ok, plan was not to create the next tiktok😂 - break over</div>
+  </header>
+  <button onclick="incrementCounterAndReload()">New Meme</button>
+  </style>
+  <img src="#">
+  <script>
+    const img = document.querySelector('img');
+    let seenGifs = new Set(JSON.parse(localStorage.getItem('seenGifs') || '[]'));
+    let offset = parseInt(localStorage.getItem('gifOffset') || '0');
+    const apiKey = '9XCN3WopnmWOrsRApYhpXhMtDI2D86BQ';
+
+    function fetchGif() {
+      // Use a random word or a list of words for the search term
+      const searchTerm = 'funny'; // This could be randomized or changed to another term
+      const url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${searchTerm}&limit=1&offset=${offset}`;
+
+      fetch(url, {mode: 'cors'})
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(response) {
+          if (response.data.length === 0) {
+            console.log('No more GIFs found for the search term.');
+            return;
+          }
+          const gifData = response.data[0]; // Take the first GIF from the response
+          if (!seenGifs.has(gifData.id)) {
+            seenGifs.add(gifData.id);
+            localStorage.setItem('seenGifs', JSON.stringify([...seenGifs]));
+            img.src = gifData.images.original.url;
+          } else {
+            console.log('GIF already seen, fetching another...');
+            offset++; // Increment the offset to get the next GIF
+            localStorage.setItem('gifOffset', offset.toString());
+            fetchGif(); // Recursively call fetchGif until a new GIF is found
+          }
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+
+    fetchGif();
+
+    let clickCount = localStorage.getItem('clickCount') ? parseInt(localStorage.getItem('clickCount')) : 0;
+    
+    function incrementCounterAndReload() {
+      clickCount++;
+      localStorage.setItem('clickCount', clickCount);
+      if(clickCount >= 50) {
+        document.getElementById('breakMessage').style.display = 'block'; // Show the break over message
+      }
+      // Always reload the page whether it's less or more than 50 clicks
+        window.location.reload();
+      }
+    
+    // Check if the message should be displayed when the page loads
+    window.onload = function() {
+      if(clickCount >= 50) {
+        document.getElementById('breakMessage').style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>
+
